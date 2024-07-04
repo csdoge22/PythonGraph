@@ -78,15 +78,63 @@ def canMultiplyMatrices(matrix1 : list, matrix2 : list) -> bool:
     
     return True
 
-# depth first search
-def dfs(graph : dict) -> None:
-    pass
+# depth first search (from first)
+def dfs(graph : dict, start) -> None:
+    if(not start in graph):
+        print('Sorry, but the graph does not contain '+str(start))
+        return None
+    # python does not have a built in stack for some reason so I used a list that behaves like a stack
+    stack = [start]
+    # lists can take more time so I used a set to keep track of visited elements
+    visited = set()
+    # the starting node appears in the stack initially
+    while(len(stack)>0):
+        current = stack.pop()
+        # if we have not printed out something, we do it and then set it as visited so that it does not print again
+        if(not current in visited):
+            print(current)
+            visited.add(current)  
+        # the reverse is done so that the traversal seems logical
+        # a for loop is done to accept all the neighbors
+        for neighbor in reversed(graph[current]):
+            if neighbor not in visited:
+                stack.append(neighbor)
 
-def bfs(graph : dict) -> None:
-    pass
+# breadth first search (from first)
+def bfs(graph : dict, start) -> None:
+    if(not start in graph):
+        print('Sorry, but the graph does not contain '+str(start))
+        return None
+    queue = [start]
+    visited = set()
+    while(len(queue)>0):
+        # queue is FIFO so we add from one side and remove from the other
+        current = queue.pop(0)
+        if(not current in visited):
+            print(current)
+            visited.add(current) 
+        for element in graph[current]:
+            if(element not in visited):
+                queue.append(element)
 
-def numPaths(graph : dict) -> int:
-    pass
+def numPaths(graph : dict, pathLength : int, start, end) -> int:
+    # as mentioned above, we will use matrix exponentiation m^n where m is the matrix and n is the exponent (which is the length of each path)
+    graphAsMatrix : list = toMatrix(graph)
+    finalMatrix : list = graphAsMatrix
+    
+    for i in range(0,pathLength):
+        finalMatrix = multiplyMatrix(finalMatrix,graphAsMatrix)
+    
+    elements = []
+    for vertex in graph:
+        elements.append(vertex)
+    if(elements.count(start)==0 or elements.count(end)==0):
+        print('Sorry, one the elements do not exist')
+        return -1
+    # duplicates do not matter since I am using a dictionary
+    row = elements.index(start)
+    col = elements.index(end)
+    return finalMatrix[row][col]
 
 # undirected graph using adjacency list
 testGraph1 = {
@@ -105,6 +153,7 @@ testGraph2 = {
     'F' : ['A','B','C','D','F'],
 }
 
+print("CONVERTING ADJACENCY LISTS TO ADJACENCY MATRICES:")
 print(toMatrix(testGraph1))
 print(toMatrix(testGraph2))
 
@@ -123,6 +172,7 @@ matrix3 = [
     [-1,-5,-2,8,-12]
 ]
 
+print("CAN MULTIPLY MATRICES (Using test matrices):")
 print(canMultiplyMatrices(matrix1,matrix2)) # true
 print(canMultiplyMatrices(matrix1,matrix3)) # false
 print(canMultiplyMatrices(matrix2,matrix3)) # true
@@ -130,3 +180,19 @@ print(canMultiplyMatrices(matrix2,matrix3)) # true
 print(multiplyMatrix(matrix1,matrix2))
 print(multiplyMatrix(matrix1,matrix3))
 print(multiplyMatrix(matrix1,matrix1))
+
+print("NUMBER OF PATHS")
+print(numPaths(testGraph1,2,'A','C'))
+print(numPaths(testGraph2,5,'F','B'))
+
+print("DEPTH FIRST SEARCH")
+dfs(testGraph1,'A')
+dfs(testGraph1,'E')
+dfs(testGraph2,'B')
+dfs(testGraph2,'G')
+
+print("BREADTH FIRST SEARCH")
+bfs(testGraph1,'A')
+bfs(testGraph1,'E')
+bfs(testGraph2,'B')
+bfs(testGraph2,'G')
