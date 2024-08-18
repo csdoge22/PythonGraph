@@ -1,0 +1,6 @@
+/* Example adjustment */
+body, #root {
+    display: flex;
+    flex-direction: column; /* Ensure it stacks vertically */
+    align-items: flex-start; /* Align items to the top */
+}
